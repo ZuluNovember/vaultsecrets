@@ -9,7 +9,7 @@ Code is designed to work with BiTaksi vault structure. It may not work for other
 ## Installation
 
 ```sh
-go install github.com/ZuluNovember/vaultsecrets
+go install github.com/ZuluNovember/vaultsecrets@latest
 ```
 
 * Make sure you have go in your PATH variables
