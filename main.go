@@ -142,6 +142,26 @@ func newCredentials() *Credentials {
 	return &Credentials{url: url, token: token}
 }
 
+func updateToken() *Credentials {
+	home, _ := os.UserHomeDir()
+	cfg, err := ini.Load(filepath.Join(home, ".vaultconf.ini"))
+	if err != nil {
+		log.Fatal("Could not load config file", err)
+	}
+
+    reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Expired token, enter a new token: ")
+	token, _ := reader.ReadString('\n')
+	token = strings.TrimSuffix(token, "\n")
+    cfg.Section("credentials").Key("token").SetValue(token)
+    cfg.SaveTo(filepath.Join(home, ".vaultconf.ini"))
+
+	url := cfg.Section("credentials").Key("url").String()
+	token = cfg.Section("credentials").Key("token").String()
+
+	return &Credentials{url: url, token: token}
+}
+
 func main() {
 	creds := newCredentials()
 	config := Config{
@@ -160,7 +180,9 @@ func main() {
 
 	repos, err := vc.listRepos("staging/metadata")
 	if err != nil {
-		log.Fatal("Could not get repos.\nError: ", err)
+        updateToken()
+        main()
+        return
 	}
 
 	choiceS, err := getChoice(stages)
